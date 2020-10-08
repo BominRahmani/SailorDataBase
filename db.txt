@@ -1,6 +1,6 @@
 SQL> /*
 SQL> Homework: create DB
-SQL> Author: <enter your first and last name here>
+SQL> Author: <Bomin Rahmani>
 SQL> */
 SQL> SELECT * FROM Sailors;
 SELECT * FROM Sailors
