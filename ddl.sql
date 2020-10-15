@@ -47,7 +47,7 @@ IC5: Every order line must belong to an order in the Order table.
 Also: if an order is deleted then all its order lines must be deleted.
 IMPORTANT: DO NOT declare this IC as DEFERRABLE.
 */
-<<< YOUR SQL CODE GOES HERE >>>
+CONSTRAINT IC5 CHECK (PRIMARY KEY (orderNum) REFERENCES Orders(orderNum))
 );
 --
 -- ----------------------------------------------------------------
