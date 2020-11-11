@@ -39,14 +39,14 @@ SET ECHO ON
 Select emp.ssn, emp.lname
 From employee emp
 -- no supervisor or last name with 2 a's
-Where emp.super_ssn IS NULL OR emp.lname LIKE "%a%a%"
+Where emp.super_ssn IS NULL OR emp.lname LIKE '%a%a%'
 --sort by ssn
 ORDER BY emp.ssn;
 
 /*(11A)
 For every employee who works more than 30 hours on any project: Find the ssn, lname, project number, project name, and numer of hours. Sort the results by ssn.
 */
-Select  emp.ssn, emp.lname, pro.number, pro.name, wo.hours
+Select  emp.ssn, emp.lname, pro.pnumber, pro.name, wo.hours
 From employee emp, project pro, works_on wo
 --works more than 30 hours on any project, Find the ssn, lname, project number, project name, and numer of hours.
 Where emp.ssn = wo.essn AND wo.hours > 30 AND wo.pno = pro.pnumber
@@ -71,8 +71,8 @@ For every employee who works for more than 20 hours on any project
 */
 SELECT DISTINCT emp.ssn, emp.lname, wo.pno, pro.plocation, emp.dno, loc.dlocation
 FROM employee emp, project pro, works_on wo, dept_locations loc
-WHERE emp.ssn = wo.essn AND emp.dno = loc.dnum
-AND wo.pno = pro.pnum AND pro.plocation = loc.dlocation
+WHERE emp.ssn = wo.essn AND emp.dno = loc.dnumber
+AND wo.pno = pro.pnumber AND pro.plocation = loc.dlocation
 AND wo.hours > 20
 --Sort the results by lname
 ORDER by emp.lname;
@@ -82,7 +82,7 @@ Write a query that consists of one block only.
 For every employee whose salary is less than 70% of his immediate supervisor's salary: Find his ssn, lname, salary; and his supervisor's ssn, lname, and salary. Sort the results by ssn.  
 */
 SELECT emp.ssn, emp.lname, emp.salary, sup.ssn, sup.lname, sup.salary
-FROM   employee E, employee sup
+FROM   employee emp, employee sup
 WHERE  emp.super_ssn = sup.ssn AND (sup.salary * .7) > emp.salary
 ORDER BY emp.ssn;
 
@@ -92,7 +92,7 @@ For projects located in Houston: Find pairs of last names such that the two empl
 SELECT emp1.lname, emp2.lname
 FROM   employee emp1, employee emp2, works_on wo1, works_on wo2, project pro
 WHERE  wo1.pno = wo2.pno AND wo1.pno = pro.pnumber AND
-       p.plocation = 'Houston' AND emp1.ssn > emp2.ssn
+       pro.plocation = 'Houston' AND emp1.ssn > emp2.ssn
 --left hand column sort
 ORDER BY emp1.lname;
 
@@ -131,13 +131,21 @@ SELECT emp.ssn, emp.lname
 FROM   employee emp
 WHERE  emp.ssn NOT IN (SELECT wo.essn
 FROM   works_on wo, project pro
-WHERE  pro.plocation = 'Houston') AND wo.pno = pro.pnumber AND 
+WHERE  pro.plocation = 'Houston' AND wo.pno = pro.pnumber) 
 ORDER BY emp.lname;
 /*(20A) Hint: This is a DIVISION query
 For every employee who works on every project that is located in Stafford: Find the ssn and lname. Sort the results by lname
 */
--- <<< Your SQL code goes here >>>
---
+SELECT emp.ssn, emp.lname
+FROM employee emp
+WHERE NOT EXISTS ( (SELECT pro.pnumber 
+		FROM project pro
+		WHERE pro.plocation = 'Stafford')
+	MINUS 
+	(SELECT wo.pno
+		FROM works_on wo
+		WHERE emp.ssn = wo.essn))
+ORDER BY emp.lname;
 SET ECHO OFF
 SPOOL OFF
 

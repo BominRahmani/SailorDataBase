@@ -1,0 +1,657 @@
+SQL> -- ---------------------------------------------------------------
+SQL> --
+SQL> -- Name: <Bomin Rahmani>
+SQL> --
+SQL> -- ------------------------------------------------------------
+SQL> -- NULL AND SUBSTRINGS -------------------------------
+SQL> --
+SQL> 
+SQL> 
+SQL> 
+SQL> /*(10A)
+SQL> */
+SQL> Select emp.ssn, emp.lname
+  2  From employee emp
+  3  -- no supervisor or last name with 2 a's
+  4  Where emp.super_ssn IS NULL OR emp.lname LIKE '%a%a%'
+  5  --sort by ssn
+  6  ORDER BY emp.ssn;
+
+SSN       LNAME                                                                 
+--------- ---------------                                                       
+666884444 Narayan                                                               
+888665555 Borg                                                                  
+987654321 Wallace                                                               
+987987987 Jabbar                                                                
+999887777 Zelaya                                                                
+
+SQL> 
+SQL> /*(11A)
+SQL> For every employee who works more than 30 hours on any project: Find the ssn, lname, project number, project name, and numer of hours. Sort the results by ssn.
+SQL> */
+SQL> Select  emp.ssn, emp.lname, pro.pnumber, pro.name, wo.hours
+  2  From employee emp, project pro, works_on wo
+  3  --works more than 30 hours on any project, Find the ssn, lname, project number, project name, and numer of hours.
+  4  Where emp.ssn = wo.essn AND wo.hours > 30 AND wo.pno = pro.pnumber
+  5  --Sort the results by ssn.
+  6  ORDER BY emp.ssn;
+Select  emp.ssn, emp.lname, pro.pnumber, pro.name, wo.hours
+                                         *
+ERROR at line 1:
+ORA-00904: "PRO"."NAME": invalid identifier 
+
+
+SQL> 
+SQL> /*(12A)
+SQL> Write a query that consists of one block only.
+SQL> */
+SQL> Select  emp.lname, emp.dno, pro.pnumber, pro.dnum
+  2  From employee emp, project pro, works_on wo
+  3  --For every employee who works on a project that is not controlled by the department he works for:
+  4  --Find the employee's lname, the department he works for, the project number that he works on,
+  5  --and the number of the department that controls that project. Sort the results by lname.
+  6  WHERE emp.ssn = wo_essn AND wo.pno = pro.pnum AND emp.dno != pro.dnum
+  7  ORDER BY emp.lname
+  8  
+SQL> /*(13A)
+SQL> For every employee who works for more than 20 hours on any project
+SQL> --that is located in the same location as his department:
+SQL> --Find the ssn, lname, project number, project location, department number, and department location.
+SQL> */
+SQL> SELECT DISTINCT emp.ssn, emp.lname, wo.pno, pro.plocation, emp.dno, loc.dlocation
+  2  FROM employee emp, project pro, works_on wo, dept_locations loc
+  3  WHERE emp.ssn = wo.essn AND emp.dno = loc.dnumber
+  4  AND wo.pno = pro.pnumber AND pro.plocation = loc.dlocation
+  5  AND wo.hours > 20
+  6  --Sort the results by lname
+  7  ORDER by emp.lname;
+
+SSN       LNAME                  PNO PLOCATION              DNO DLOCATION       
+--------- --------------- ---------- --------------- ---------- --------------- 
+987987987 Jabbar                  10 Stafford                 4 Stafford        
+666884444 Narayan                  3 Houston                  5 Houston         
+123456789 Smith                    1 Bellaire                 5 Bellaire        
+999887777 Zelaya                  30 Stafford                 4 Stafford        
+
+SQL> 
+SQL> /*(14A)
+SQL> Write a query that consists of one block only.
+SQL> For every employee whose salary is less than 70% of his immediate supervisor's salary: Find his ssn, lname, salary; and his supervisor's ssn, lname, and salary. Sort the results by ssn.
+SQL> */
+SQL> SELECT emp.ssn, emp.lname, emp.salary, sup.ssn, sup.lname, sup.salary
+  2  FROM   employee emp, employee sup
+  3  WHERE  emp.super_ssn = sup.ssn AND (sup.salary * .7) > emp.salary
+  4  ORDER BY emp.ssn;
+
+SSN       LNAME               SALARY SSN       LNAME               SALARY       
+--------- --------------- ---------- --------- --------------- ----------       
+453453453 English              25000 333445555 Wong                 40000       
+987987987 Jabbar               25000 987654321 Wallace              43000       
+999887777 Zelaya               25000 987654321 Wallace              43000       
+
+SQL> 
+SQL> /*(15A)
+SQL> For projects located in Houston: Find pairs of last names such that the two employees in the pair work on the same project. Remove duplicates. Sort the result by the lname in the left column in the result.
+SQL> */
+SQL> SELECT emp1.lname, emp2.lname
+  2  FROM   employee emp1, employee emp2, works_on wo1, works_on wo2, project pro
+  3  WHERE  wo1.pno = wo2.pno AND wo1.pno = pro.pnumber AND
+  4  	    pro.plocation = 'Houston' AND emp1.ssn > emp2.ssn
+  5  --left hand column sort
+  6  ORDER BY emp1.lname;
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Borg            Narayan                                                         
+Borg            Smith                                                           
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            Smith                                                           
+Borg            Narayan                                                         
+Borg            English                                                         
+Borg            Wong                                                            
+Borg            English                                                         
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+English         Smith                                                           
+English         Wong                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+English         Smith                                                           
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Jabbar          Wong                                                            
+Jabbar          Smith                                                           
+Jabbar          Wallace                                                         
+Jabbar          Borg                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Jabbar          Narayan                                                         
+Jabbar          English                                                         
+Narayan         English                                                         
+Narayan         Smith                                                           
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Smith                                                           
+Narayan         English                                                         
+Narayan         Wong                                                            
+Narayan         Wong                                                            
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wallace         Borg                                                            
+Wallace         Narayan                                                         
+Wallace         English                                                         
+Wallace         Wong                                                            
+Wallace         Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Wong            Smith                                                           
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+Zelaya          Jabbar                                                          
+Zelaya          Wallace                                                         
+Zelaya          Borg                                                            
+Zelaya          Narayan                                                         
+Zelaya          English                                                         
+Zelaya          Wong                                                            
+Zelaya          Smith                                                           
+
+LNAME           LNAME                                                           
+--------------- ---------------                                                 
+Zelaya          Jabbar                                                          
+
+364 rows selected.
+
+SQL> 
+SQL> /*(16A) Hint: A NULL in the hours column should be considered as zero hours.
+SQL> Find the ssn, lname, and the total number of hours worked on projects for every employee whose total is less than 40 hours. Sort the result by lname
+SQL> */
+SQL> SELECT emp.ssn, emp.lname
+  2  FROM   employee emp, works_on wo
+  3  WHERE  emp.ssn = wo.essn
+  4  GROUP BY emp.ssn, emp.lname
+  5  HAVING SUM(wo.hours) < 40 OR SUM(wo.hours) IS NULL
+  6  ORDER BY emp.lname;
+
+SSN       LNAME                                                                 
+--------- ---------------                                                       
+888665555 Borg                                                                  
+987654321 Wallace                                                               
+
+SQL> /*(17A)
+SQL> For every project that has more than 2 employees working on it: Find the project number, project name, number of employees working on it, and the total number of hours worked by all employees on that project. Sort the results by project number.
+SQL> */
+SQL> SELECT pro.pnumber, pro.pname, COUNT(*), SUM (wo.hours)
+  2  FROM   works_on wo, project pro
+  3  WHERE  wo.pno = pro.pnumber
+  4  GROUP BY pro.pnumber, pro.pname
+  5  HAVING COUNT(*) > 2
+  6  ORDER BY pro.pnumber;
+
+   PNUMBER PNAME             COUNT(*) SUM(WO.HOURS)                             
+---------- --------------- ---------- -------------                             
+         2 ProductY                 3          37.5                             
+        10 Computerization          3            55                             
+        20 Reorganization           3            25                             
+        30 Newbenefits              3            55                             
+
+SQL> 
+SQL> /*(18A)
+SQL> For every employee who has the highest salary in his department: Find the dno, ssn, lname, and salary . Sort the results by department number.
+SQL> */
+SQL> SELECT emp1.dno, emp1.ssn, emp1.lname, emp1.salary
+  2  FROM   employee emp1
+  3  WHERE  emp1.salary = (SELECT MAX(emp2.salary)
+  4  FROM   Employee emp2
+  5  WHERE  emp1.dno = emp2.dno)
+  6  ORDER BY emp1.dno;
+
+       DNO SSN       LNAME               SALARY                                 
+---------- --------- --------------- ----------                                 
+         1 888665555 Borg                 55000                                 
+         4 987654321 Wallace              43000                                 
+         5 333445555 Wong                 40000                                 
+
+SQL> /*(19A)
+SQL> For every employee who does not work on any project that is located in Houston: Find the ssn and lname. Sort the results by lname
+SQL> */
+SQL> SELECT emp.ssn, emp.lname
+  2  FROM   employee emp
+  3  WHERE  emp.ssn NOT IN (SELECT wo.essn
+  4  FROM   works_on wo, project pro
+  5  WHERE  pro.plocation = 'Houston' AND wo.pno = pro.pnumber)
+  6  ORDER BY emp.lname;
+
+SSN       LNAME                                                                 
+--------- ---------------                                                       
+453453453 English                                                               
+987987987 Jabbar                                                                
+123456789 Smith                                                                 
+999887777 Zelaya                                                                
+
+SQL> /*(20A) Hint: This is a DIVISION query
+SQL> For every employee who works on every project that is located in Stafford: Find the ssn and lname. Sort the results by lname
+SQL> */
+SQL> SELECT emp.ssn, emp.lname
+  2  FROM employee emp
+  3  WHERE NOT EXISTS ( (SELECT pro.pnumber
+  4  		     FROM project pro
+  5  		     WHERE pro.plocation = 'Stafford')
+  6  	     MINUS
+  7  	     (SELECT wo.pno
+  8  		     FROM works_on wo
+  9  		     WHERE emp.ssn = wo.essn))
+ 10  ORDER BY emp.lname;
+
+SSN       LNAME                                                                 
+--------- ---------------                                                       
+987987987 Jabbar                                                                
+999887777 Zelaya                                                                
+
+SQL> SET ECHO OFF
